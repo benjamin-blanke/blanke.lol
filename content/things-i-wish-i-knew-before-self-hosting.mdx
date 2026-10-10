@@ -1,0 +1,189 @@
+---
+title: "Things I Wish I Knew Before Self-Hosting"
+publishedAt: "2026-09-26"
+summary: "The lessons I learned from running my own servers — backups, networking, security, monitoring, documentation, and why breaking things is part of the process."
+image: "/blog/self-hosting-cover.png"
+---
+
+Self-hosting looks simple from the outside.
+
+Get a server, install Linux, point a domain at it, deploy a few services and you're done.
+
+At least, that's what I thought.
+
+Once I started running more of my own infrastructure, I quickly realized that getting something online is usually the easy part. Keeping it reliable, secure and understandable six months later is where things get interesting.
+
+This isn't meant to be a perfect self-hosting guide. It's a collection of things I wish I understood earlier — mostly learned by building, breaking, fixing and rebuilding things myself.
+
+## Backups are not optional
+
+One of the easiest mistakes to make when starting out is thinking: "I'll set up backups later."
+
+Later has a habit of becoming *after something breaks*.
+
+A service can be reinstalled. A VM can be recreated. But databases, configuration, user data and files may be impossible to recover if the only copy lived on the machine that just died.
+
+The important part isn't just having a backup job. A backup you have never restored is basically an assumption.
+
+- Back up anything you would be annoyed to rebuild.
+- Back up anything you cannot rebuild.
+- Keep important backups somewhere other than the original host.
+- Test restoring them.
+
+## DNS will eventually humble you
+
+DNS looks incredibly simple until you're debugging it.
+
+You change an `A` or `AAAA` record, refresh the page, and nothing happens. Then you start questioning your DNS provider, reverse proxy, browser cache, IPv6, TLS and eventually your own sanity.
+
+I learned to stop randomly changing things and instead check the path one step at a time.
+
+What does the domain resolve to? Is the server reachable? Is the port open? Is the reverse proxy listening? Is TLS working? Is the application itself actually alive?
+
+Breaking a problem into layers makes networking much less mysterious.
+
+## IPv6 is great — until something assumes IPv4
+
+I've worked with IPv6-only virtual machines, and it taught me much more about networking than simply using a normal dual-stack server would have.
+
+Modern infrastructure can work perfectly well over IPv6, but the internet is still full of services and software that quietly assume IPv4 connectivity exists.
+
+The bigger lesson is understanding **where traffic is actually going**.
+
+Tools like `curl`, `ping`, `dig`, `ip`, routing tables and logs became far more useful once I stopped treating networking as magic.
+
+## A reverse proxy makes life much easier
+
+Running every application directly on a random public port becomes messy very quickly.
+
+A reverse proxy gives everything a clean entry point:
+
+```text
+app.example.com
+status.example.com
+api.example.com
+```
+
+instead of exposing a collection of random ports.
+
+Tools like Caddy or nginx can handle routing and TLS in front of the actual services.
+
+There is one rule I learned quickly: when something goes wrong, **read the proxy logs before changing five unrelated settings**.
+
+## Logs are usually telling you the answer
+
+At the beginning, an application not working feels like: **It doesn't work.**
+
+That's not a useful debugging state.
+
+The better question is: **Which layer doesn't work?**
+
+Check the service:
+
+```bash
+systemctl status my-service
+```
+
+Then its logs:
+
+```bash
+journalctl -u my-service -n 100
+```
+
+Check listening ports:
+
+```bash
+ss -tulpn
+```
+
+Then test the application locally before blaming DNS or the reverse proxy:
+
+```bash
+curl http://127.0.0.1:3000
+```
+
+The error message often tells you exactly what's wrong. You just have to find the right error message first.
+
+## Don't expose everything to the internet
+
+Just because a service *can* listen publicly doesn't mean it should.
+
+Dashboards, databases, admin panels and internal APIs usually don't need to be directly reachable from the public internet.
+
+Where possible, I prefer services to listen locally and expose only what actually needs to be public through a reverse proxy. Private networking tools can handle management interfaces without opening another public port.
+
+The goal is to reduce the number of things an attacker can even talk to in the first place.
+
+## Automation is amazing until you forget how it works
+
+Automation is one of my favorite parts of running infrastructure.
+
+Automatic deployments, systemd services, scheduled jobs, monitoring, restart policies and scripts can turn a fragile setup into something that mostly manages itself.
+
+But if you automate something you don't understand, the moment it breaks you now have two problems: the original problem and an automation layer you don't understand.
+
+I try to understand the manual process first and automate it second.
+
+## Monitoring should exist before you need it
+
+When you're the person running a service, "someone will tell me if it goes down" is technically a monitoring strategy.
+
+It's just a terrible one.
+
+Useful monitoring doesn't have to be complicated. At minimum, I want to know whether the service is reachable, how long it has been unavailable, whether it recovered, whether the underlying server is healthy, and whether something is repeatedly crashing.
+
+A public status page is useful for users, but internal monitoring is just as important.
+
+## Document the weird stuff
+
+Some fixes feel so obvious immediately after solving them that you think you'll remember them forever.
+
+You won't.
+
+Three months later you'll find the same configuration and wonder why a strange firewall rule, proxy setting or routing workaround exists.
+
+I like documenting unusual network configuration, important file locations, service names, required environment variables, deployment commands, backup locations and — most importantly — **why a workaround exists**.
+
+## Don't change five things at once
+
+When something breaks, changing DNS, firewall rules, application config, TLS settings and the reverse proxy at the same time feels productive.
+
+It isn't.
+
+If the service suddenly starts working, you don't know which change fixed it.
+
+Now I try to change one variable, test, observe, and continue. Debugging becomes dramatically easier when you can actually connect cause and effect.
+
+## Breaking things is part of learning
+
+Probably the biggest lesson I've learned from self-hosting is that breaking things isn't necessarily failure.
+
+I've broken networking, TLS, permissions and services that worked perfectly five minutes earlier.
+
+Those moments taught me more than following a perfect installation guide ever could.
+
+Snapshots, backups and good notes give you the freedom to experiment without turning every mistake into a disaster.
+
+## Keep it simple
+
+It's tempting to turn a small setup into a miniature hyperscale cloud.
+
+Kubernetes. Multiple clusters. Service meshes. Ten dashboards. Three databases.
+
+Complex infrastructure can be fun to learn, but complexity should usually solve a real problem.
+
+Sometimes a VM, a systemd service and a reverse proxy are enough.
+
+The best infrastructure isn't necessarily the one with the most technology. It's the one you understand, can maintain, can recover, and can still explain to yourself six months later.
+
+## Final thoughts
+
+Self-hosting has taught me far more than how to install software on Linux.
+
+It forced me to learn about networking, DNS, TLS, virtualization, permissions, monitoring, backups, automation and debugging — because eventually every one of those things breaks.
+
+And that's probably why I enjoy it.
+
+You start with a server and an idea. Then something fails. You figure out why. You fix it. And next time, you build it a little better.
+
+That's the part of self-hosting I wish I understood from the beginning: **the problems aren't interruptions to the learning process. They are the learning process.**
