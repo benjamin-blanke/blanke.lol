@@ -14,7 +14,7 @@
 
 <br />
 
-<img src="cover.png" alt="blanke.lol — Portfolio Preview" width="100%" />
+<img src="v5.png" alt="blanke.lol — Portfolio Preview" width="100%" />
 
 <br />
 
