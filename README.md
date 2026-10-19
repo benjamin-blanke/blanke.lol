@@ -3,10 +3,14 @@
 # Benjamin Blanke
 
 **Personal Portfolio · Developer · Creator**
-
-[![Website](https://img.shields.io/badge/blanke.lol-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://blanke.lol)
-[![GitHub](https://img.shields.io/badge/GitHub-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/benjamin-blanke)
-[![Vercel](https://img.shields.io/badge/▲_Powered_by_Vercel-000000?style=for-the-badge&logoColor=white)](https://vercel.com)
+<p align="center">
+  <a href="https://discord.gg/opushost">
+    <img src="https://shieldcn.dev/badge/Discord-Join%20the%20community-5865F2.svg?logo=discord" alt="Join the Discord">
+  </a>
+  <a href="https://blanke.lol/blog/how-i-built-opus-host">
+    <img src="https://shieldcn.dev/badge/Blog-Read%20the%20announcement-0ea5e9.svg?logo=readme" alt="Read the blog post">
+  </a>
+</p>
 
 <br />
 
