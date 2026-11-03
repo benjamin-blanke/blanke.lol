@@ -4,7 +4,7 @@
 
 **Personal Portfolio · Developer · Creator**
 <p align="center">
-  <a href="https://discord.gg/opushost">
+  <a href="https://discord.gg/waveserv">
     <img src="https://shieldcn.dev/badge/Discord-Join%20the%20community-5865F2.svg?logo=discord" alt="Join the Discord">
   </a>
   <a href="https://blanke.lol/blog/how-i-built-opus-host">
